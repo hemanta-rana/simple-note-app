@@ -9,11 +9,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
+import javax.swing.*;
 
 public class SimpleNoteApp extends Application {
     private ListView<String> noteList;
     private TextArea noteEditor;
     private TextField titleField;
+
 
 
     @Override
@@ -51,10 +56,11 @@ public class SimpleNoteApp extends Application {
         MenuItem newNote = new MenuItem("New Note");
         MenuItem saveNote = new MenuItem("Save Note");
         MenuItem deleteNote = new MenuItem("Delete Note");
-//
-//        newNote.setOnAction(e-> createNewNote());
-//        saveNote.setOnAction(e-> saveCurrentNote());
-//        deleteNote.setOnAction(e-> deleCurrentNote());
+
+
+        newNote.setOnAction(e-> createNewNote());
+        saveNote.setOnAction(e-> saveCurrentNote());
+        deleteNote.setOnAction(e-> deleteCurrentNote());
 
 
         fileMenu.getItems().addAll(newNote, saveNote, deleteNote);
@@ -72,7 +78,17 @@ public class SimpleNoteApp extends Application {
         noteList = new ListView<>();
         noteList.getItems().addAll("My first Note", "Shopping list", "Meeting Notes");
 
-        //TODO  note selection
+        //  note selection
+        noteList.getSelectionModel().selectedItemProperty().addListener(
+                ((observableValue, oldValue, newValue) ->{
+
+                    if (newValue!= null){
+                        loadNoteContent(newValue);
+                    }
+                }
+                        )
+        );
+
 
 
 
@@ -102,7 +118,9 @@ public class SimpleNoteApp extends Application {
         Button clearButton = new Button("Clear");
         clearButton.setPrefWidth(75);
 
-
+//        set action on button
+            saveButton.setOnAction(e-> saveCurrentNote());
+            clearButton.setOnAction(e-> clearEditor());
         buttonPanel.getChildren().addAll(saveButton, clearButton);
 
         rightPanel.getChildren().addAll(
@@ -110,18 +128,64 @@ public class SimpleNoteApp extends Application {
                 contentLabel, noteEditor,
                 buttonPanel
         );
-
-
-
-
-
         return rightPanel;
+    }
+
+    public void createNewNote(){
+        titleField.clear();
+        noteEditor.clear();
+        noteList.getSelectionModel().clearSelection();
+        titleField.requestFocus();
+    }
+    public void saveCurrentNote(){
+        String title = titleField.getText().trim();
+        String content = noteEditor.getText();
+
+        if (title.isEmpty()){
+//            show alert
+            showAlert("Error","Please enter a note title ");
+            return;
+        }
+        if (!noteList.getItems().contains(title)){
+            noteList.getItems().add(title);
+
+        }
+
+        // TODO save in the database
+
+        showAlert("Success", "Note saved Successfully! ");
+    }
+    public void deleteCurrentNote(){
+        String selected = noteList.getSelectionModel().getSelectedItem();
+        if (selected!= null){
+            noteList.getItems().remove(selected);
+            clearEditor();
+        }
+    }
+    public void clearEditor(){
+        titleField.clear();
+        noteEditor.clear();
+    }
+    public void loadNoteContent(String noteTitle){
+        titleField.setText(noteTitle);
+
+        // todo load content from database
+        noteEditor.setText("content for: "+noteTitle);
     }
 
 
     public static void main(String[] args) {
         launch(args);
     }
+
+    public void showAlert(String title, String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
 
 
