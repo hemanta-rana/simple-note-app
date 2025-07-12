@@ -19,7 +19,7 @@ public class DatabaseManager {
 
     public void createNoteTable() {
         String sql = "CREATE TABLE IF NOT EXISTS notes (" +
-                "id INTEGER PRIMARY KEY NOT NULL AUTO INCREMENT, " +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "title TEXT NOT NULL, " +
                 "description TEXT NOT NULL, " +
                 "time TEXT NOT NULL" +
@@ -43,16 +43,18 @@ public class DatabaseManager {
 
 
     }
-    public boolean addNote(String title, String description, String time){
-        String sql = "INSERT INTO notes ( title, description,date) VALUES" +
+    public boolean addNote(Note note){
+        String sql = "INSERT INTO notes ( title, description,time) VALUES" +
                 "(?,?,?)";
 
         try(Connection connection = connect();
             PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setString(1,title);
-            pstmt.setString(2, description);
-            pstmt.setString(3, time);
+            pstmt.setString(1,note.getTitle());
+            pstmt.setString(2, note.getDescription());
+            pstmt.setString(3, note.getTime());
             pstmt.executeUpdate();
+
+            System.out.println("saved successfully ");
             return true;
         }catch (SQLException e){
             e.printStackTrace();

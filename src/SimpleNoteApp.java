@@ -1,6 +1,4 @@
 
-
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -12,18 +10,16 @@ import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-import javax.swing.*;
-
 public class SimpleNoteApp extends Application {
     private ListView<String> noteList;
     private TextArea noteEditor;
     private TextField titleField;
 
-
+    DatabaseManager databaseManager = new DatabaseManager();
 
     @Override
     public void start(Stage stage) throws Exception {
-
+        databaseManager.createNoteTable();
         // create the main layout
         BorderPane root = new BorderPane();
 
@@ -76,7 +72,7 @@ public class SimpleNoteApp extends Application {
         listLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         noteList = new ListView<>();
-        noteList.getItems().addAll("My first Note", "Shopping list", "Meeting Notes");
+//        noteList.getItems().addAll("");
 
         //  note selection
         noteList.getSelectionModel().selectedItemProperty().addListener(
@@ -112,6 +108,8 @@ public class SimpleNoteApp extends Application {
         noteEditor.setPromptText("write your note here ");
         noteEditor.setWrapText(true);
 
+        Label time = new Label("Date");
+
         HBox buttonPanel = new HBox(10);
         Button saveButton = new Button("Save");
         saveButton.setPrefWidth(75);
@@ -126,7 +124,7 @@ public class SimpleNoteApp extends Application {
         rightPanel.getChildren().addAll(
                 titleLabel, titleField,
                 contentLabel, noteEditor,
-                buttonPanel
+                time,buttonPanel
         );
         return rightPanel;
     }
@@ -148,6 +146,7 @@ public class SimpleNoteApp extends Application {
         }
         if (!noteList.getItems().contains(title)){
             noteList.getItems().add(title);
+            databaseManager.addNote(new Note(title, content));
 
         }
 
@@ -185,6 +184,7 @@ public class SimpleNoteApp extends Application {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
 
 
 
