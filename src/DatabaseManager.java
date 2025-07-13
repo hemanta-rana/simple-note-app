@@ -86,6 +86,20 @@ public class DatabaseManager {
         return notes;
 
     }
+    public void deleteNote(String title){
+        String sql = "DELETE FROM notes WHERE title = ? ";
+
+        try( Connection conn = connect();
+           PreparedStatement ps = conn.prepareStatement(sql)  ){
+            ps.setString(1,title);
+            ps.executeUpdate();
+            System.out.println("successfully deleted ");
+
+        }catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("sql error ");
+        }
+    }
 
 
 }

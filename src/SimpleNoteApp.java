@@ -14,6 +14,7 @@ public class SimpleNoteApp extends Application {
     private ListView<String> noteList;
     private TextArea noteEditor;
     private TextField titleField;
+    private Label time;
 
     DatabaseManager databaseManager = new DatabaseManager();
 
@@ -35,8 +36,10 @@ public class SimpleNoteApp extends Application {
         VBox rightPanel = createRightPanel();
         root.setCenter(rightPanel);
 
+
+        loadFromDatabase();
         // create the scene
-        Scene scene = new Scene(root, 800,800);
+        Scene scene = new Scene(root, 800,600);
 
         // set up the stage
         stage.setTitle("Note app");
@@ -84,15 +87,7 @@ public class SimpleNoteApp extends Application {
                 }
                         )
         );
-
-
-
-
-
         leftPanel.getChildren().addAll(listLabel, noteList);
-
-
-
         return leftPanel;
     }
     private VBox createRightPanel(){
@@ -108,7 +103,7 @@ public class SimpleNoteApp extends Application {
         noteEditor.setPromptText("write your note here ");
         noteEditor.setWrapText(true);
 
-        Label time = new Label("Date");
+        time = new Label("Date");
 
         HBox buttonPanel = new HBox(10);
         Button saveButton = new Button("Save");
@@ -156,8 +151,10 @@ public class SimpleNoteApp extends Application {
     }
     public void deleteCurrentNote(){
         String selected = noteList.getSelectionModel().getSelectedItem();
+
         if (selected!= null){
             noteList.getItems().remove(selected);
+            databaseManager.deleteNote(selected);
             clearEditor();
         }
     }
@@ -167,9 +164,24 @@ public class SimpleNoteApp extends Application {
     }
     public void loadNoteContent(String noteTitle){
         titleField.setText(noteTitle);
-
-        // todo load content from database
-        noteEditor.setText("content for: "+noteTitle);
+//        boolean found = false;
+        for (Note note: databaseManager.showAllNote()){
+            if (note.getTitle().equals(noteTitle)){
+                noteEditor.setText(note.getDescription());
+                time.setText("Note saved : "+note.getTime());
+                break;
+            }
+        }
+    }
+    public void loadFromDatabase(){
+        try{
+            noteList.getItems().clear();
+            for (Note note: databaseManager.showAllNote()){
+                noteList.getItems().add(note.getTitle());
+            }
+        }catch (Exception e){
+            showAlert("Error","failed to load notes");
+        }
     }
 
 
@@ -184,10 +196,4 @@ public class SimpleNoteApp extends Application {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-
-
-
-
-
 }
