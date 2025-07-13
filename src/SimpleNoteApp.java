@@ -143,7 +143,12 @@ public class SimpleNoteApp extends Application {
             noteList.getItems().add(title);
             databaseManager.addNote(new Note(title, content));
 
+        } else {
+            databaseManager.updateNote(new Note(title, content));
         }
+
+
+
 
         // TODO save in the database
 

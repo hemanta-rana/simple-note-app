@@ -100,6 +100,21 @@ public class DatabaseManager {
             System.out.println("sql error ");
         }
     }
+    public void updateNote(Note note){
+        String sql = "UPDATE notes SET description = ? where title = ? ";
+
+        try (Connection conn = connect();
+            PreparedStatement ps = conn.prepareStatement(sql) ){
+            ps.setString(1, note.getDescription());
+            ps.setString(2, note.getTitle());
+            ps.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("success ");
+        }
+
+
+    }
 
 
 }
